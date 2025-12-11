@@ -1,29 +1,72 @@
-{% extends 'news/base.html' %}
+{% extends "news/base.html" %}
 
-{% block title %}Все новости{% endblock %}
+{% block title %}Все новости — Новостной портал{% endblock %}
 
 {% block content %}
-    <h2 style="text-align:center; color:#2c3e50;">Последние опубликованные новости</h2>
+    <h2 style="text-align:center; color:#2c3e50; margin-bottom:30px;">
+        Последние опубликованные новости
+    </h2>
 
     <div class="search">
-        <form method="get">
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Поиск по заголовку или тексту...">
-            <button type="submit">Найти</button>
+        <form method="get" style="text-align:center; margin-bottom:40px;">
+            <input 
+                type="text" 
+                name="q" 
+                value="{{ request.GET.q }}" 
+                placeholder="Поиск по заголовку или тексту..." 
+                style="padding:14px; width:70%; max-width:600px; border:1px solid #ddd; border-radius:6px; font-size:1.1rem;">
+            <button 
+                type="submit" 
+                style="padding:14px 28px; background:#3498db; color:white; border:none; border-radius:6px; cursor:pointer; font-size:1.1rem; margin-left:10px;">
+                Найти
+            </button>
         </form>
     </div>
 
     {% for article in articles %}
         <div class="article">
-            <h2><a href="{% url 'news:detail' article.pk %}" style="color:#2980b9;">{{ article.title }}</a></h2>
+            <h2>
+                <a href="{% url 'news:detail' article.pk %}" style="color:#2980b9; text-decoration:none;">
+                    {{ article.title }}
+                </a>
+            </h2>
             <div class="meta">
-                Автор: <strong>{{ article.author.get_full_name|default:article.author.username }}</strong> |
+                Автор: <strong>{{ article.author.get_full_name|default:article.author.username }}</strong> • 
                 {{ article.created_at|date:"d.m.Y в H:i" }}
             </div>
             <p>{{ article.content|truncatewords:60|linebreaks }}</p>
+            <a href="{% url 'news:detail' article.pk %}" style="color:#3498db; font-weight:bold;">Читать полностью →</a>
         </div>
     {% empty %}
-        <p style="text-align:center; color:#95a5a6;">Новостей пока нет.</p>
+        <p style="text-align:center; color:#95a5a6; font-size:1.2rem; padding:50px;">
+            Новостей пока нет
+        </p>
     {% endfor %}
 
-    {% include "news/pagination.html" %}
+    {% if is_paginated %}
+        <div style="text-align:center; margin:50px 0; font-size:1.1rem;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   style="margin:0 10px; padding:12px 20px; background:#3498db; color:white; text-decoration:none; border-radius:6px;">
+                    ← Предыдущая
+                </a>
+            {% else %}
+                <span style="margin:0 10px; padding:12px 20px; color:#bbb;">← Предыдущая</span>
+            {% endif %}
+
+            <span style="margin:0 20px; font-weight:bold; color:#2c3e50;">
+                Страница {{ page_obj.number }} из {{ paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   style="margin:0 10px; padding:12px 20px; background:#3498db; color:white; text-decoration:none; border-radius:6px;">
+                    Следующая →
+                </a>
+            {% else %}
+                <span style="margin:0 10px; padding:12px 20px; color:#bbb;">Следующая →</span>
+            {% endif %}
+        </div>
+    {% endif %}
+
 {% endblock %}
