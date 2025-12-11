@@ -1,0 +1,18 @@
+{% extends 'news/base.html' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+    <div class="article">
+        <h1>{{ article.title }}</h1>
+        <div class="meta">
+            Автор: <strong>{{ article.author.get_full_name|default:article.author.username }}</strong> |
+            Опубликовано: {{ article.created_at|date:"d F Y года в H:i" }}
+        </div>
+        <hr style="margin:30px 0;">
+        <div style="font-size:1.1rem;">{{ article.content|linebreaks }}</div>
+        <p style="margin-top:40px;">
+            <a href="{% url 'news:list' %}">← Вернуться к списку новостей</a>
+        </p>
+    </div>
+{% endblock %}

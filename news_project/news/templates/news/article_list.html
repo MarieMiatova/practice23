@@ -1,0 +1,29 @@
+{% extends 'news/base.html' %}
+
+{% block title %}Все новости{% endblock %}
+
+{% block content %}
+    <h2 style="text-align:center; color:#2c3e50;">Последние опубликованные новости</h2>
+
+    <div class="search">
+        <form method="get">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Поиск по заголовку или тексту...">
+            <button type="submit">Найти</button>
+        </form>
+    </div>
+
+    {% for article in articles %}
+        <div class="article">
+            <h2><a href="{% url 'news:detail' article.pk %}" style="color:#2980b9;">{{ article.title }}</a></h2>
+            <div class="meta">
+                Автор: <strong>{{ article.author.get_full_name|default:article.author.username }}</strong> |
+                {{ article.created_at|date:"d.m.Y в H:i" }}
+            </div>
+            <p>{{ article.content|truncatewords:60|linebreaks }}</p>
+        </div>
+    {% empty %}
+        <p style="text-align:center; color:#95a5a6;">Новостей пока нет.</p>
+    {% endfor %}
+
+    {% include "news/pagination.html" %}
+{% endblock %}
